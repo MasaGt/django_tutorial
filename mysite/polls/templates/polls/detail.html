@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <p>{{q.content}}</p>
+    <ul>
+      {% for choice in q.choise_set.all %}
+        <li>{{ choice.text }}</li>
+      {% endfor %}
+    </ul>
+    <p>{{q.pub_date}}</p>
+  </body>
+</html>
