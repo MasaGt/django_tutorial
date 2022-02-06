@@ -2,15 +2,22 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>{{ q.content }}調査画面</title>
   </head>
   <body>
-    <p>{{q.content}}</p>
-    <ul>
-      {% for choice in q.choise_set.all %}
-        <li>{{ choice.text }}</li>
-      {% endfor %}
-    </ul>
-    <p>{{q.pub_date}}</p>
+    <form class="vote-form" action="{% url 'polls:vote' q.id%}" method="post">
+      {% csrf_token %}
+      <fieldset>
+        <legend>{{q.content}}</legend>
+        {% if error_msg %}
+          <p><strong>{{ error_msg }}</strong></p>
+        {% endif %}
+        {% for choice in q.choice_set.all %}
+          <input type="radio" name="choice" value="{{ choice.id }}">
+          <label for="choice{{ forloop.counter }}">{{ choice.text }}</label><br>
+        {% endfor %}
+      </fieldset>
+      <input type="submit" name="" value="Vote">
+    </form>
   </body>
 </html>
