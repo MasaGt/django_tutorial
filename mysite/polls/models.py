@@ -14,7 +14,7 @@ class Question(models.Model):
         return self.pub_date <= timezone.now()
 
 
-class Choise(models.Model):
+class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.CharField(max_length=50)
     vote_num = models.IntegerField(default=0)
