@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .models import Question, Choice
 from django.http import Http404
 from django.urls import reverse
+from django.db.models import F
 # Create your views here.
 
 
@@ -50,7 +51,11 @@ def vote(request, q_id):
                      }
                     )
     else:
-        selected_choice.vote_num += 1
+        # this can cause race condition
+        # selected_choice.vote_num += 1
+        selected_choice.vote_num = F('vote_num') + 1
+        # reload the value of selected_choice
+        selected_choice.refresh_from_db() 
         selected_choice.save()
         return HttpResponseRedirect(
                     reverse('polls:result', args=(q_id,))
