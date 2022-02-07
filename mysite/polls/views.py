@@ -55,3 +55,9 @@ def vote(request, q_id):
         return HttpResponseRedirect(
                     reverse('polls:result', args=(q_id,))
                     )
+        # This is not a good way go to the next page (when POST data is sent)
+        return render(
+                request,
+                'polls/result.html',
+                {'q': q}
+                )
