@@ -4,36 +4,29 @@ from .models import Question, Choice
 from django.http import Http404
 from django.urls import reverse
 from django.db.models import F
+from django.views import generic
 # Create your views here.
 
 
-def index(request):
-    q_list = Question.objects.order_by('-pub_date')
-    return render(
-                request,
-                'polls/index.html',
-                {'q_list': q_list}
-                )
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    # TODO: ↓これは何?
+    context_object_name = 'q_list'
+
+    def get_queryset(self):
+        return Question.objects.all()
 
 
-def detail(request, q_id):
-    q = get_object_or_404(Question, id=q_id)
-    # choices = get_list_or_404(Choise, question=q_id)
-    return render(
-                request,
-                'polls/detail.html',
-                {'q': q}
-                )
+class DetailView(generic.DetailView):
+    model = Question
+    context_object_name = 'q'
+    template_name = 'polls/detail.html'
 
 
-def result(request, q_id):
-    q = get_object_or_404(Question, pk=q_id)
-    return render(
-                request,
-                'polls/result.html',
-                {'q': q}
-
-    )
+class ResultView(generic.DetailView):
+    model = Question
+    context_object_name = 'q'
+    template_name = 'polls/result.html'
 
 
 def vote(request, q_id):
@@ -54,9 +47,9 @@ def vote(request, q_id):
         # this can cause race condition
         # selected_choice.vote_num += 1
         selected_choice.vote_num = F('vote_num') + 1
-        # reload the value of selected_choice
-        selected_choice.refresh_from_db() 
         selected_choice.save()
+        # reload the value of selected_choice in database
+        selected_choice.refresh_from_db()
         return HttpResponseRedirect(
                     reverse('polls:result', args=(q_id,))
                     )
