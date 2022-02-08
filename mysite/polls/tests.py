@@ -1,8 +1,8 @@
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.urls import reverse
 import datetime
 from django.utils import timezone
 from polls.models import Question
-
 # Create your tests here.
 
 
@@ -24,3 +24,14 @@ class QuestionModelTests(TestCase):
         time = timezone.now() - datetime.timedelta(days=1)
         old_quetion = Question(pub_date=time)
         self.assertIs(old_quetion.was_published(), True)
+
+
+class ViewTests(TestCase):
+    def test_index_view_with_get(self):
+        """
+        when an user access with '/polls/'
+        there should be a page returned and response status is 200
+        """
+        client = Client()
+        response = client.get(reverse('polls:index'))
+        self.assertIs(response.status_code, 200)
