@@ -5,6 +5,7 @@ from django.http import Http404
 from django.urls import reverse
 from django.db.models import F
 from django.views import generic
+from django.utils import timezone
 # Create your views here.
 
 
@@ -14,7 +15,8 @@ class IndexView(generic.ListView):
     context_object_name = 'q_list'
 
     def get_queryset(self):
-        return Question.objects.all()
+        # return question that published in the past
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 
 class DetailView(generic.DetailView):
