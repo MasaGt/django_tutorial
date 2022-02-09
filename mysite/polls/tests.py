@@ -45,7 +45,7 @@ def create_question(content, days):
     return question
 
 
-def access_by_get(test_class, url_name):
+def access_by_get(test_class, url_name, *param):
     """
     access url_name by get request
 
@@ -55,11 +55,16 @@ def access_by_get(test_class, url_name):
         use it's client.get() to access a page by get
     url_name: str
         name argument of path function in urls.py
+    params: object
+        parameter needed to access a view
     """
-    return test_class.client.get(reverse(url_name))
+    if param:
+        return test_class.client.get(reverse(url_name, args=param))
+    else:
+        return test_class.client.get(reverse(url_name))
 
 
-class ViewTests(TestCase):
+class IndexViewTests(TestCase):
     def test_index_view_with_get(self):
         """
         when an user access with '/polls/'
@@ -159,3 +164,43 @@ class ViewTests(TestCase):
                             response.context['q_list'],
                             [question1, question2]
                             )
+
+
+class DetailViewTests(TestCase):
+    def test_future_question(self):
+        """
+        Pass if server returns "404 not found"
+        and there is no question data in response
+        """
+        question = create_question(
+                        content="Question will be published in the future",
+                        days=30
+                        )
+
+        response = access_by_get(
+                        self,
+                        "polls:detail",
+                        (question.pk)
+                        )
+
+        # if there is not a model in response, detailView returns 404 error
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_question(self):
+        """
+        Pass if there is a question data in response
+        """
+        question = create_question(
+                        content="Question published in the past",
+                        days=-30
+                        )
+
+        response = access_by_get(
+                        self,
+                        "polls:detail",
+                        (question.pk)
+                        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, question.content)
