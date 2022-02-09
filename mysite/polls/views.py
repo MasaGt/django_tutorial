@@ -24,6 +24,18 @@ class DetailView(generic.DetailView):
     context_object_name = 'q'
     template_name = 'polls/detail.html'
 
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now())
+
+    # NOTE: ↓ This code also works like get_queryset().
+    # But this is not as clear as get_queryset()
+    # def get_object(self):
+    #     question = super().get_object()
+    #     if not (question.was_published()):
+    #         raise []
+    #     else:
+    #         return question
+
 
 class ResultView(generic.DetailView):
     model = Question
